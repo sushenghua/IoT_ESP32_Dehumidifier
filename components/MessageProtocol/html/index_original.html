@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <title>Dishwasher Dehumidifier</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+      background-color: #000000;
+    }
+    .monitor-pane {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      border-radius: 10px;
+      width: 420px;
+      margin: 20px 0 20px 0;
+      padding: 20px;
+      background-color: #252525;;
+    }
+    .monitor {
+        width: 200px;
+        border-radius: 10px;
+        background-color: #313131;
+        overflow: hidden;
+    }
+    .monitor .titlebar {
+      height: 50px;
+      border-bottom: 1px solid;
+      border-color: #494949;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+    }
+    .fan {
+      height: 30px;
+      width: 30px;
+      margin-left: 15px;
+    }
+    .monitor h3 {
+        text-align: center;
+        color: #cacaca;
+        font-size: 20px;
+    }
+    .monitor .values {
+      padding: 0 30px 0 30px;
+      border-color: #616161;
+    }
+    .monitor p {
+      font-size: 18px;
+      color: #bebebe;
+    }
+    .monitor .vv {
+      padding: 0 0 0 20px;
+      color:#11ccd3
+    }
+    .monitor .unit {
+      padding: 0 0 0 5px;
+      /* text-align-last:right; */
+      /* color:#11ccd3 */
+    }
+    .control-pane {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 420px;
+      margin: 0 0 20px 0;
+      padding: 20px;
+      border-radius: 10px;
+      background-color: #252525;
+    }
+    .input-group input {
+      margin: 10px 10px 10px 20px;
+      padding: 0 6px 0 6px;
+      height: 20px;
+      width: 50px;
+      border-radius: 5px;
+      border-color: transparent;
+      background-color: #bbbbbb;
+    }
+    .input-group label {
+      margin-top: 10px;
+      font-size: 15px;
+      float: left;
+    }
+    .input-group input:disabled {
+      background-color: #777;
+    }
+    .input-group input:disabled+label {
+      color: #666;
+    }
+    .radio-group {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 20px 0 10px 0;
+        gap: 20px;
+        font-family: Arial, sans-serif;
+        color: #969696;
+    }
+    .radio-input {
+        display: none;
+    }
+    .radio-label {
+        text-align: center;
+        width: 50px;
+        padding: 10px 20px;
+        /* border: 1px solid #ddd; */
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background-color: #353535;
+    }
+    .radio-input:checked + .radio-label {
+        background-color: #009499;
+        color: white;
+        border-color: transparent;
+    }
+    .update-pane {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 420px;
+      padding: 20px;
+      border-radius: 10px;
+      background-color: #252525;
+      font-family: Arial, sans-serif;
+      font-size: 15px;
+      color: #bebebe;
+    }
+    .info {
+      width: 170px;
+      margin-top: 10px;
+      /* background: #666; */
+    }
+    #progress {
+      width: 170px;
+      margin-top: 10px;
+      /* background: #666; */
+      display: none;
+    }
+    #cvv {
+      padding: 0 0 0 20px;
+      color:#11ccd3
+    }
+    #rvv {
+      padding: 0 0 0 20px;
+      color:#11ccd3
+    }
+    #pgv {
+      padding: 0 0 0 20px;
+      color:#11ccd3
+    }
+    button {
+      width: 200px;
+      font-size: 18px;
+      font-weight: bold;
+      padding: 10px 20px;
+      margin: 20px 0 10px 0;
+      border-radius: 5px;
+      border: none;
+      color: #ddd;
+      background-color: #006909;
+      cursor: pointer;
+    }
+    button:active{
+        color: #fff;
+        background-color: #02970e;
+    }
+    .input-group {
+      color: #bbb;
+    }
+  </style>
+</head>
+<body>
+  <svg xmlns="http://www.w3.org/2000/svg" id="fanShape" fill="#555" width="30px" height="30px" viewBox="0 0 24 24" style="display:none;">
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 3.48154C7.29535 3.48154 3.48148 7.29541 3.48148 12.0001C3.48148 16.7047 7.29535 20.5186 12 20.5186C16.7046 20.5186 20.5185 16.7047 20.5185 12.0001C20.5185 7.29541 16.7046 3.48154 12 3.48154ZM2 12.0001C2 6.47721 6.47715 2.00006 12 2.00006C17.5228 2.00006 22 6.47721 22 12.0001C22 17.5229 17.5228 22.0001 12 22.0001C6.47715 22.0001 2 17.5229 2 12.0001Z"/>
+    <path d="M12 11.3C11.8616 11.3 11.7262 11.3411 11.6111 11.418C11.496 11.4949 11.4063 11.6042 11.3533 11.7321C11.3003 11.86 11.2864 12.0008 11.3134 12.1366C11.3405 12.2724 11.4071 12.3971 11.505 12.495C11.6029 12.5929 11.7277 12.6596 11.8634 12.6866C11.9992 12.7136 12.14 12.6997 12.2679 12.6467C12.3958 12.5937 12.5051 12.504 12.582 12.3889C12.6589 12.2738 12.7 12.1385 12.7 12C12.7 11.8144 12.6262 11.6363 12.495 11.505C12.3637 11.3738 12.1857 11.3 12 11.3ZM12.35 5.00002C15.5 5.00002 15.57 7.49902 13.911 8.32502C13.6028 8.50778 13.3403 8.75856 13.1438 9.05822C12.9473 9.35787 12.8218 9.69847 12.777 10.054C13.1117 10.1929 13.4073 10.4116 13.638 10.691C16.2 9.29102 19 9.84401 19 12.35C19 15.5 16.494 15.57 15.675 13.911C15.4869 13.6029 15.232 13.341 14.9291 13.1448C14.6262 12.9485 14.283 12.8228 13.925 12.777C13.7844 13.1108 13.566 13.406 13.288 13.638C14.688 16.221 14.128 19 11.622 19C8.5 19 8.423 16.494 10.082 15.668C10.3852 15.4828 10.644 15.2332 10.84 14.9368C11.036 14.6404 11.1644 14.3046 11.216 13.953C10.8729 13.8188 10.5711 13.5967 10.341 13.309C7.758 14.695 5 14.149 5 11.65C5 8.50002 7.478 8.42302 8.304 10.082C8.48945 10.3888 8.74199 10.6496 9.04265 10.8448C9.34332 11.0399 9.68431 11.1645 10.04 11.209C10.1748 10.8721 10.3971 10.5772 10.684 10.355C9.291 7.80001 9.844 5.00002 12.336 5.00002H12.35Z"/>
+  </svg>
+  <div class="monitor-pane">
+    <div class="monitor">
+        <div class="titlebar">
+          <h3>顶排</h3>
+          <div class="fan"></div>
+        </div>
+        <div class="values">
+          <p>温度: <span class="vv" id="s0t">-</span><span class="unit"> °C</span></p>
+          <p>湿度: <span class="vv" id="s0h">-</span><span class="unit">  %</span></p>
+        </div>
+    </div>
+    <div class="monitor">
+      <div class="titlebar">
+        <h3>门排</h3>
+        <div class="fan"></div>
+      </div>
+      <div class="values">
+        <p>温度: <span class="vv" id="s1t">-</span><span class="unit"> °C</span></p>
+        <p>湿度: <span class="vv" id="s1h">-</span><span class="unit">  %</span></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="control-pane">
+    <div class="input-group">
+      <div>
+        <input id="lh" type="number" name="ticketNum" value="50" step="5" min="0" max="100"/>
+        <label for="lh">关闭湿度:</label>
+      </div>
+      <div>
+        <input id="gh" type="number" name="ticketNum" value="70" step="5" min="0" max="100"/>
+        <label for="gh">打开湿度:</label>
+      </div>
+      <div>
+        <input id="dt" type="number" name="ticketNum" value="30" step="10" min="0" max="300"/>
+        <label for="dt">延时关闭:</label>
+      </div>
+    </div>
+    <div class="radio-group">
+      <input type="radio" id="auto" name="option" class="radio-input">
+      <label for="auto" class="radio-label">自动</label>
+      <input type="radio" id="delay" name="option" class="radio-input">
+      <label for="delay" class="radio-label">延时</label>
+      <input type="radio" id="on" name="option" class="radio-input">
+      <label for="on" class="radio-label">常开</label>
+      <input type="radio" id="off" name="option" class="radio-input">
+      <label for="off" class="radio-label">常关</label>
+    </div>
+    <button id="submit">确定</button>
+  </div>
+  <div class="update-pane">
+    <div class="info">
+      <label class="vtitle">当前版本:</label>
+      <label id="cvv">-</label>
+    </div>
+    <div id="progress">
+      <label class="vtitle">更新进度:</label>
+      <label id="pgv">-</label>
+    </div>
+    <button id="fmw-update">固件更新</button>
+  </div>
+    <script>
+      var mv
+      el = id => document.getElementById(id)
+      eel = (id, e, l) => { el(id).addEventListener(e, l) }
+      sp = (id, p, v) => { el(id)[p] = v }
+      sa = (id, a, v) => { el(id).setAttribute(a, v) }
+      setFan = (id, on) => { sa(id, 'fill', on?"#11ccd3":"#555") }
+      setNum = (id, v) => { sp(id, 'innerText', v.toFixed(1)) }
+      setVal = (id, v) => { sp(id, 'innerText', v) }
+      setInput = (id, v) => { sp(id, 'value', v.toFixed()) }
+      disable = (id, v=true) => { sp(id, 'disabled', v) }
+      checkbtn = (id) => { sp(id, 'checked', true) }
+      ev = (id) => Number(el(id).value)
+      setsvg = () => {
+        f0 = el('fanShape')
+        f1 = f0.cloneNode(true)
+        f0.setAttribute('id', 'f0')
+        f1.setAttribute('id', 'f1')
+        f0.style.display = 'block'
+        f1.style.display = 'block'
+        fcs = document.getElementsByClassName('fan')
+        fcs[0].appendChild(f0)
+        fcs[1].appendChild(f1)
+      }
+      updatemode = () => wssend({
+        "cmd": "SetFanOpMode",
+        "mode": mv,
+        'lthr': ev('lh'),
+        'gthr': ev('gh'),
+        'min': ev('dt')
+      })
+      modechanged = (m) => {
+        if (m === 'auto') {
+          checkbtn('auto')
+          disable('dt')
+          disable('lh', false)
+          disable('gh', false)
+        } else if (m === 'delay') {
+          checkbtn('delay')
+          disable('dt', false)
+          disable('lh')
+          disable('gh')
+        } else if (m === 'on') {
+          checkbtn('on')
+          disable('dt')
+          disable('lh')
+          disable('gh')
+        } else if (m === 'off') {
+          checkbtn('off')
+          disable('dt')
+          disable('lh')
+          disable('gh')
+        }
+        mv = m
+      }
+      setsvg()
+      ws = new WebSocket("ws://" + location.host + "/ws")
+      var polli = null
+      ws.onopen = (e) => { pollmode(); pollver(); polli = setInterval(polldata, 1000); }
+      ws.onclose = () => clearInterval(polli)
+      ws.onmessage = (e) => {
+        msg = JSON.parse(e.data)
+        if (msg.cmd === 'GetSensorData') {
+          setNum('s0t', msg.ret.s0.temp)
+          setNum('s0h', msg.ret.s0.humid)
+          setNum('s1t', msg.ret.s1.temp)
+          setNum('s1h', msg.ret.s1.humid)
+          setFan('f0',  msg.ret.f0.on)
+          setFan('f1',  msg.ret.f1.on)
+        } else if (msg.cmd === 'GetFanOpMode') {
+          mode = msg.ret.mode
+          modechanged(mode)
+          setInput('lh', msg.ret.lthr)
+          setInput('gh', msg.ret.gthr)
+          setInput('dt', msg.ret.min)
+        } else if (msg.cmd === 'GetFirmwareVersion') {
+          setVal("cvv", msg.ret)
+        } else if (msg.cmd === 'UpdateRet') {
+          el("progress").style.display = 'block'
+          if (msg.code === 1)       setVal("pgv", "已经最新版")
+          else if (msg.code === 0)  setVal("pgv", "更新完成")
+          else if (msg.code === 12) setVal("pgv", msg.val + ' %')
+        }
+      }
+      wssend = (jmsg) => ws.send(JSON.stringify(jmsg))
+      polldata = () => wssend({"cmd": "GetSensorData", "retfmt": "json"})
+      pollmode = () => wssend({"cmd": "GetFanOpMode", "retfmt": "json"})
+      pollver = () => wssend({"cmd": "GetFirmwareVersion", "retfmt": "json"})
+      eel('submit', 'click', updatemode)
+      eel('auto', 'change', (e) => { if (e.target.checked) modechanged('auto') })
+      eel('delay', 'change', (e) => { if (e.target.checked) modechanged('delay') })
+      eel('on', 'change', (e) => { if (e.target.checked) modechanged('on')})
+      eel('off', 'change', (e) => { if (e.target.checked) modechanged('off')})
+      eel('fmw-update', 'click', () => wssend({"cmd": "UpdateFirmware"}))
+    </script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+/*
+ * main: manage tasks of different modules
+ * Copyright (c) 2017 Shenghua Su
+ *
+ */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/////////////////////////////////////////////////////////////////////////////////////////
+// app_main task
+/////////////////////////////////////////////////////////////////////////////////////////
+#include "System.h"
+void app_main()
+{
+    System::instance()->init();
+}
+
+#ifdef __cplusplus
+}
+#endif
