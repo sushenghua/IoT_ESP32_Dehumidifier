@@ -16,5 +16,5 @@ update with lib [eps-idf](https://github.com/espressif/esp-idf.git) and removal 
 
 ### Program features
 - Self-contained HttpServer, hosting tiny html and js
-- OTA service over WebSocket connection
+- OTA service over WebSocket connection, service implementation found at [IoT_Firmware_WS_Updater](https://github.com/sushenghua/IoT_Firmware_WS_Updater)
 
